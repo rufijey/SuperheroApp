@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { SuperheroForm } from "../../modules/superhero/components/SuperheroForm/SuperheroForm";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../shared/store/store";
-import { updateSuperhero } from "../../modules/superhero/store/superhero.slice";
+import { updateSuperhero} from "../../modules/superhero/store/superhero.slice";
 import { CircularProgress } from "@mui/material";
 import {useSelectedSuperhero} from "../../shared/hooks/useSelectedSuperhero.ts";
 
@@ -16,8 +16,14 @@ const EditSuperheroPage: React.FC = () => {
 
     const handleSubmit = async (fd: FormData) => {
         if (!heroId) return;
-        await dispatch(updateSuperhero({ id: heroId, hero: fd }));
-        navigate(`/superheroes/${heroId}`);
+
+        try{
+            await dispatch(updateSuperhero({ id: heroId, hero: fd })).unwrap();
+            navigate(`/superheroes/${heroId}`);
+        }
+        catch(err){
+            console.log(err);
+        }
     };
 
     if (!heroId) return <div>Invalid ID</div>;

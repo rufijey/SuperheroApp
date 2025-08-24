@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useDropzone } from "react-dropzone";
-import { RxCross2 } from "react-icons/rx";
-import { TextField, Button } from "@mui/material";
+import React, {useState, useEffect, useCallback} from "react";
+import {useDropzone} from "react-dropzone";
+import {RxCross2} from "react-icons/rx";
+import {TextField, Button, Stack, Alert} from "@mui/material";
 import styles from "./SuperheroForm.module.css";
-import { Image, Superhero } from "../../services/superheroService.ts";
+import {Image, Superhero} from "../../services/superheroService.ts";
+import {useSelector} from "react-redux";
+import {RootState} from "../../../../shared/store/store.ts";
 
 interface ImagePreview {
     file?: File;
@@ -16,7 +18,7 @@ interface SuperheroFormProps {
     onSubmit: (formData: FormData) => void;
 }
 
-export const SuperheroForm: React.FC<SuperheroFormProps> = ({ initialData, onSubmit }) => {
+export const SuperheroForm: React.FC<SuperheroFormProps> = ({initialData, onSubmit}) => {
     const [form, setForm] = useState({
         nickname: "",
         real_name: "",
@@ -28,7 +30,8 @@ export const SuperheroForm: React.FC<SuperheroFormProps> = ({ initialData, onSub
     const [images, setImages] = useState<ImagePreview[]>([]);
     const [removeImageIds, setRemoveImageIds] = useState<number[]>([]);
 
-    // Загружаем начальные данные
+    const errors = useSelector((state: RootState) => state.superheroes.errors);
+
     useEffect(() => {
         if (initialData) {
             setForm({
@@ -47,10 +50,9 @@ export const SuperheroForm: React.FC<SuperheroFormProps> = ({ initialData, onSub
     }, [initialData]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        setForm({...form, [e.target.name]: e.target.value});
     };
 
-    // Dropzone
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const newFiles = acceptedFiles.map(file => ({
             file,
@@ -59,14 +61,13 @@ export const SuperheroForm: React.FC<SuperheroFormProps> = ({ initialData, onSub
         setImages(prev => [...prev, ...newFiles]);
     }, []);
 
-    const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
+    const {getRootProps, getInputProps, isDragActive, isDragReject} = useDropzone({
         onDrop,
-        accept: { "image/*": [] },
+        accept: {"image/*": []},
         multiple: true,
     });
 
     const handleRemoveImage = (image: ImagePreview) => {
-        // Если это существующее изображение — добавляем в removeImageIds
         if (image.id) setRemoveImageIds(prev => [...prev, image.id!]);
         setImages(prev => prev.filter(i => i !== image));
     };
@@ -133,18 +134,28 @@ export const SuperheroForm: React.FC<SuperheroFormProps> = ({ initialData, onSub
                 margin="normal"
             />
 
-            <div {...getRootProps({ className: dropzoneClasses })}>
+            <div {...getRootProps({className: dropzoneClasses})}>
                 <input {...getInputProps()} />
                 <p>Drag & drop images here, or click to select</p>
                 <div className={styles.preview__container}>
                     {images.map((image, index) => (
                         <div key={index} className={styles.previewItem}>
-                            <img src={image.url} alt="Preview" className={styles.previewImage} />
-                            <RxCross2 className={styles.delete} onClick={() => handleRemoveImage(image)} />
+                            <img src={image.url} alt="Preview" className={styles.previewImage}/>
+                            <RxCross2 className={styles.delete} onClick={() => handleRemoveImage(image)}/>
                         </div>
                     ))}
                 </div>
             </div>
+
+            {errors && errors.length > 0 && (
+                <Stack spacing={1} sx={{ mt: 2 }}>
+                    {errors.map((msg, i) => (
+                        <Alert key={i} severity="error" variant="filled">
+                            {msg}
+                        </Alert>
+                    ))}
+                </Stack>
+            )}
 
             <Button type="submit" variant="contained" className={styles.submit}>
                 Save

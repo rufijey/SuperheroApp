@@ -11,8 +11,13 @@ const CreateSuperheroPage: React.FC = () => {
     const navigate = useNavigate();
 
     const handleSubmit = async (fd: FormData) => {
-        await dispatch(createSuperhero(fd));
-        navigate("/");
+        try{
+            await dispatch(createSuperhero(fd)).unwrap();
+            navigate("/");
+        }
+        catch(err){
+            console.log(err);
+        }
     };
 
     return (
