@@ -1,0 +1,35 @@
+
+.card {
+    margin: 16px 0;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.image {
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-top: 12px;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    justify-content: flex-end;
+}
+
+.hero__info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+}
